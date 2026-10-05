@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CareerHub - Job Portal</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Arial,sans-serif;background:#f5f7fb;color:#1f2937;line-height:1.6}
+nav{background:#111827;color:#fff;padding:16px 6%;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}.logo{font-size:24px;font-weight:800}.nav-links{display:flex;gap:22px}.nav-links a{color:#fff;text-decoration:none;cursor:pointer;font-weight:600}
+.hero{background:linear-gradient(135deg,#2563eb,#4f46e5);color:#fff;text-align:center;padding:65px 6%}.hero h1{font-size:44px;margin-bottom:12px}.hero p{font-size:18px;margin-bottom:25px}.hero-search{max-width:850px;margin:auto;display:flex;gap:10px;flex-wrap:wrap}.hero-search input,.hero-search select{flex:1;min-width:200px;padding:14px;border:0;border-radius:10px;font-size:15px}
+.container{width:88%;max-width:1200px;margin:35px auto}.toolbar{display:flex;gap:12px;flex-wrap:wrap;margin:20px 0}.toolbar input,.toolbar select{padding:12px;border:1px solid #d1d5db;border-radius:9px}.search{flex:1;min-width:220px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:22px}
+.card,.application{background:#fff;border-radius:16px;padding:22px;box-shadow:0 5px 20px #0001}.card:hover{transform:translateY(-3px)}.company-icon{width:55px;height:55px;border-radius:12px;background:#eef2ff;color:#4338ca;display:flex;align-items:center;justify-content:center;font-size:25px;margin-bottom:15px}.card h3{margin-bottom:5px}.company{color:#4b5563;font-weight:600}.meta{color:#6b7280;font-size:14px;margin:7px 0}.tags{display:flex;gap:7px;flex-wrap:wrap;margin:13px 0}.tag{background:#eef2ff;color:#3730a3;padding:5px 9px;border-radius:20px;font-size:12px;font-weight:700}.salary{font-size:18px;font-weight:800;margin:12px 0}
+.btn{border:0;border-radius:9px;padding:11px 17px;background:#2563eb;color:#fff;cursor:pointer;font-weight:700}.btn.secondary{background:#e5e7eb;color:#111827}.empty{text-align:center;padding:50px;color:#6b7280}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:30;align-items:center;justify-content:center;padding:20px}.modal-box{background:#fff;border-radius:16px;padding:25px;max-width:520px;width:100%;max-height:90vh;overflow:auto}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.close{font-size:28px;cursor:pointer}.form-group{margin:12px 0}.form-group label{display:block;font-weight:700;margin-bottom:5px}.form-group input,.form-group textarea{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:9px;font-family:inherit}.form-group textarea{min-height:100px;resize:vertical}.summary{background:#f3f4f6;padding:15px;border-radius:10px}.status{display:inline-block;padding:5px 10px;border-radius:20px;background:#dcfce7;color:#166534;font-size:12px;font-weight:bold}.toast{position:fixed;right:20px;bottom:20px;background:#111827;color:#fff;padding:14px 20px;border-radius:10px;display:none;z-index:40}footer{text-align:center;padding:30px;background:#111827;color:#fff;margin-top:50px}
+@media(max-width:700px){.hero h1{font-size:34px}.nav-links{gap:10px;font-size:14px}.hero-search{flex-direction:column}}
+</style>
+</head>
+<body>
+<nav><div class="logo">💼 CareerHub</div><div class="nav-links"><a onclick="showSection('jobs')">Jobs</a><a onclick="showSection('applications')">My Applications</a></div></nav>
+
+<section class="hero"><h1>Find Your Next Opportunity</h1><p>Discover jobs, apply easily, and take the next step in your career.</p>
+<div class="hero-search"><input id="heroSearch" placeholder="Job title, skill or company" oninput="syncSearch()"><select id="heroCategory" onchange="syncCategory()"><option value="all">All Categories</option><option>Software</option><option>Data</option><option>Design</option><option>Marketing</option><option>Finance</option><option>HR</option></select></div></section>
+
+<main class="container">
+<section id="jobs"><h2>Latest Job Opportunities</h2><div class="toolbar"><input id="search" class="search" placeholder="Search jobs, skills or companies..." oninput="renderJobs()"><select id="category" onchange="renderJobs()"><option value="all">All Categories</option><option>Software</option><option>Data</option><option>Design</option><option>Marketing</option><option>Finance</option><option>HR</option></select><select id="location" onchange="renderJobs()"><option value="all">All Locations</option><option>Bengaluru</option><option>Hyderabad</option><option>Chennai</option><option>Pune</option><option>Remote</option></select></div><div id="jobGrid" class="grid"></div></section>
+
+<section id="applications" style="display:none"><h2>My Applications</h2><div id="applicationList" style="margin-top:20px"></div></section>
+</main>
+
+<div id="applyModal" class="modal"><div class="modal-box"><div class="modal-head"><h2>Apply for Job</h2><span class="close" onclick="closeModal()">×</span></div><div id="jobSummary" class="summary"></div>
+<div class="form-group"><label>Full Name</label><input id="name" placeholder="Enter your name"></div><div class="form-group"><label>Email</label><input id="email" type="email" placeholder="Enter your email"></div><div class="form-group"><label>Phone Number</label><input id="phone" placeholder="Enter your phone number"></div><div class="form-group"><label>Resume Link</label><input id="resume" placeholder="Google Drive / portfolio / resume link"></div><div class="form-group"><label>Cover Letter</label><textarea id="cover" placeholder="Write a short message"></textarea></div><button class="btn" style="width:100%" onclick="submitApplication()">Submit Application</button></div></div>
+<div id="toast" class="toast"></div><footer>© 2026 CareerHub • Job Portal</footer>
+
+<script>
+const jobs=[
+{id:1,title:"Junior Java Developer",company:"TechNova Solutions",category:"Software",location:"Bengaluru",type:"Full Time",salary:"₹4 - ₹6 LPA",icon:"☕",skills:["Java","Spring Boot","SQL"]},
+{id:2,title:"Data Analyst - Fresher",company:"DataSphere Analytics",category:"Data",location:"Hyderabad",type:"Full Time",salary:"₹3.5 - ₹5 LPA",icon:"📊",skills:["Python","Excel","SQL"]},
+{id:3,title:"Frontend Developer",company:"WebCraft Labs",category:"Software",location:"Remote",type:"Full Time",salary:"₹4 - ₹7 LPA",icon:"💻",skills:["HTML","CSS","React"]},
+{id:4,title:"UI/UX Designer",company:"Creative Pixel",category:"Design",location:"Pune",type:"Full Time",salary:"₹3 - ₹5 LPA",icon:"🎨",skills:["Figma","UI Design","UX"]},
+{id:5,title:"Digital Marketing Executive",company:"GrowthEdge Media",category:"Marketing",location:"Chennai",type:"Full Time",salary:"₹2.5 - ₹4 LPA",icon:"📣",skills:["SEO","Social Media","Content"]},
+{id:6,title:"Business Analyst Intern",company:"FinCore Technologies",category:"Finance",location:"Hyderabad",type:"Internship",salary:"₹15K - ₹25K/month",icon:"📈",skills:["Excel","SQL","Power BI"]},
+{id:7,title:"HR Executive",company:"PeopleFirst Pvt Ltd",category:"HR",location:"Bengaluru",type:"Full Time",salary:"₹3 - ₹4.5 LPA",icon:"👥",skills:["Recruitment","Communication","HR"]},
+{id:8,title:"Python Developer",company:"CloudMatrix",category:"Software",location:"Remote",type:"Full Time",salary:"₹5 - ₹8 LPA",icon:"🐍",skills:["Python","Django","API"]}
+];
+let selectedJob=null,applications=JSON.parse(localStorage.getItem("careerHubApplications")||"[]");
+
+function renderJobs(){const q=document.getElementById("search").value.toLowerCase(),cat=document.getElementById("category").value,loc=document.getElementById("location").value;
+const f=jobs.filter(j=>(j.title.toLowerCase().includes(q)||j.company.toLowerCase().includes(q)||j.skills.join(" ").toLowerCase().includes(q))&&(cat==="all"||j.category===cat)&&(loc==="all"||j.location===loc));
+document.getElementById("jobGrid").innerHTML=f.length?f.map(j=>`<div class="card"><div class="company-icon">${j.icon}</div><h3>${j.title}</h3><div class="company">${j.company}</div><div class="meta">📍 ${j.location} • ${j.type}</div><div class="tags">${j.skills.map(s=>`<span class="tag">${s}</span>`).join("")}</div><div class="salary">${j.salary}</div><button class="btn" onclick="openApply(${j.id})">Apply Now</button></div>`).join(""):'<div class="empty">No jobs found.</div>'}
+function syncSearch(){document.getElementById("search").value=document.getElementById("heroSearch").value;renderJobs()}
+function syncCategory(){document.getElementById("category").value=document.getElementById("heroCategory").value;renderJobs()}
+function openApply(id){selectedJob=jobs.find(j=>j.id===id);document.getElementById("jobSummary").innerHTML=`<strong>${selectedJob.icon} ${selectedJob.title}</strong><br>${selectedJob.company}<br>📍 ${selectedJob.location} • ${selectedJob.type}<br>💰 ${selectedJob.salary}`;document.getElementById("applyModal").style.display="flex"}
+function closeModal(){document.getElementById("applyModal").style.display="none"}
+function submitApplication(){const name=document.getElementById("name").value.trim(),email=document.getElementById("email").value.trim(),phone=document.getElementById("phone").value.trim();
+if(!name||!email||!phone){showToast("Please fill name, email and phone.");return}
+const a={id:"APP"+Date.now(),job:selectedJob.title,company:selectedJob.company,location:selectedJob.location,name,email,phone,resume:document.getElementById("resume").value.trim(),cover:document.getElementById("cover").value.trim(),date:new Date().toLocaleDateString("en-IN"),status:"Applied"};
+applications.push(a);localStorage.setItem("careerHubApplications",JSON.stringify(applications));["name","email","phone","resume","cover"].forEach(x=>document.getElementById(x).value="");closeModal();renderApplications();showToast("Application submitted!");showSection("applications")}
+function renderApplications(){const b=document.getElementById("applicationList");if(!applications.length){b.innerHTML='<div class="empty">You have not applied for any jobs yet.</div>';return}b.innerHTML=applications.map(a=>`<div class="application" style="margin-bottom:15px"><h3>💼 ${a.job}</h3><p><b>${a.company}</b> • 📍 ${a.location}</p><p>Applicant: ${a.name} • ${a.email}</p><p>Application ID: ${a.id} • Applied: ${a.date}</p><span class="status">${a.status}</span><button class="btn secondary" style="float:right" onclick="withdrawApplication('${a.id}')">Withdraw</button></div>`).join("")}
+function withdrawApplication(id){applications=applications.filter(a=>a.id!==id);localStorage.setItem("careerHubApplications",JSON.stringify(applications));renderApplications();showToast("Application withdrawn.")}
+function showSection(s){document.getElementById("jobs").style.display=s==="jobs"?"block":"none";document.getElementById("applications").style.display=s==="applications"?"block":"none";if(s==="applications")renderApplications();scrollTo({top:0,behavior:"smooth"})}
+function showToast(m){const t=document.getElementById("toast");t.textContent=m;t.style.display="block";setTimeout(()=>t.style.display="none",2500)}
+window.onclick=e=>{if(e.target===document.getElementById("applyModal"))closeModal()};renderJobs();renderApplications();
+</script>
+</body></html>
